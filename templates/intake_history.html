@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Intake History</h1>
+
+<table border="1" cellpadding="8">
+    <tr>
+        <th>Date</th>
+        <th>Total Calories (kcal)</th>
+        <th>Total Protein (g)</th>
+        <th>Total Carbs (g)</th>
+        <th>Total Fat (g)</th>
+        <th>Action</th>
+    </tr>
+
+    {% for day in history %}
+    <tr>
+        <td>{{ day.intake_date }}</td>
+        <td>{{ day.total_calories|floatformat:1 }}</td>
+        <td>{{ day.total_protein|floatformat:1 }}</td>
+        <td>{{ day.total_carbs|floatformat:1 }}</td>
+        <td>{{ day.total_fat|floatformat:1 }}</td>
+        <td>
+            <a href="{% url 'intake_history_detail' day.intake_date|date:'Y-m-d' %}">View Details</a>
+        </td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="6">No history records yet.</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

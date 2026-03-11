@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>My Daily Intake Records</h1>
+
+<p><a href="{% url 'add_intake' %}">Add New Intake</a></p>
+
+<table border="1" cellpadding="8">
+    <tr>
+        <th>Date</th>
+        <th>Food</th>
+        <th>Source</th>
+        <th>Quantity (g)</th>
+        <th>Calories (kcal)</th>
+        <th>Protein (g)</th>
+        <th>Carbs (g)</th>
+        <th>Fat (g)</th>
+        <th>Actions</th>
+    </tr>
+
+    {% for intake in intakes %}
+    <tr>
+        <td>{{ intake.intake_date }}</td>
+        <td>
+            {% if intake.public_food %}
+                {{ intake.public_food.name }}
+            {% elif intake.custom_food %}
+                {{ intake.custom_food.name }}
+            {% endif %}
+        </td>
+        <td>
+            {% if intake.public_food %}
+                Public
+            {% elif intake.custom_food %}
+                Custom
+            {% endif %}
+        </td>
+        <td>{{ intake.quantity_grams|floatformat:1 }}</td>
+        <td>{{ intake.calories_consumed|floatformat:1 }}</td>
+        <td>{{ intake.protein_consumed|floatformat:1 }}</td>
+        <td>{{ intake.carbs_consumed|floatformat:1 }}</td>
+        <td>{{ intake.fat_consumed|floatformat:1 }}</td>
+        <td>
+            <a href="{% url 'edit_intake' intake.id %}">Edit</a> |
+            <a href="{% url 'delete_intake' intake.id %}">Delete</a>
+        </td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="9">No intake records yet.</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

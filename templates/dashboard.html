@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Dashboard</h1>
+
+<h2>Today's Summary</h2>
+<ul>
+    <li>Total Calories: {{ total_calories|floatformat:1 }} kcal</li>
+    <li>Total Protein: {{ total_protein|floatformat:1 }} g</li>
+    <li>Total Carbs: {{ total_carbs|floatformat:1 }} g</li>
+    <li>Total Fat: {{ total_fat|floatformat:1 }} g</li>
+</ul>
+
+<h2>Daily Goals</h2>
+<ul>
+    <li>Target Calories: {{ target_calories|floatformat:1 }} kcal</li>
+    <li>Target Protein: {{ target_protein|floatformat:1 }} g</li>
+    <li>Target Carbs: {{ target_carbs|floatformat:1 }} g</li>
+    <li>Target Fat: {{ target_fat|floatformat:1 }} g</li>
+</ul>
+
+<h2>Calories Status</h2>
+{% if remaining_calories >= 0 %}
+    <p>Remaining Calories: {{ remaining_calories|floatformat:1 }} kcal</p>
+{% else %}
+    <p>Exceeded by: {{ remaining_calories|add:"0"|floatformat:1|cut:"-" }} kcal</p>
+{% endif %}
+
+<h2>Recent Intake Records</h2>
+<table border="1" cellpadding="8">
+    <tr>
+        <th>Date</th>
+        <th>Food</th>
+        <th>Quantity (g)</th>
+        <th>Calories (kcal)</th>
+        <th>Protein (g)</th>
+        <th>Carbs (g)</th>
+        <th>Fat (g)</th>
+    </tr>
+
+    {% for intake in intakes %}
+    <tr>
+        <td>{{ intake.intake_date }}</td>
+        <td>
+            {% if intake.public_food %}
+                {{ intake.public_food.name }}
+            {% elif intake.custom_food %}
+                {{ intake.custom_food.name }}
+            {% endif %}
+        </td>
+        <td>{{ intake.quantity_grams|floatformat:1 }}</td>
+        <td>{{ intake.calories_consumed|floatformat:1 }}</td>
+        <td>{{ intake.protein_consumed|floatformat:1 }}</td>
+        <td>{{ intake.carbs_consumed|floatformat:1 }}</td>
+        <td>{{ intake.fat_consumed|floatformat:1 }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="7">No intake records yet.</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

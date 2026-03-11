@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>User Profile</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save Profile</button>
+</form>
+
+{% if profile.bmi_value %}
+    <h2>BMI Result</h2>
+    <p>BMI: {{ profile.bmi_value|floatformat:1 }}</p>
+    <p>Category: {{ profile.bmi_category }}</p>
+{% endif %}
+{% endblock %}

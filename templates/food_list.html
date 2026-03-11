@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Food Catalogue</h1>
+
+<p><a href="{% url 'add_custom_food' %}">Add Custom Food</a></p>
+
+<h2>Public Foods</h2>
+<table border="1" cellpadding="8">
+    <tr>
+        <th>Name</th>
+        <th>Calories / 100g (kcal)</th>
+        <th>Protein / 100g</th>
+        <th>Carbs / 100g</th>
+        <th>Fat / 100g</th>
+    </tr>
+
+    {% for food in public_foods %}
+    <tr>
+        <td>{{ food.name }}</td>
+        <td>{{ food.calories_per_100g|floatformat:1 }}</td>
+        <td>{{ food.protein_per_100g|floatformat:1 }}</td>
+        <td>{{ food.carbs_per_100g|floatformat:1 }}</td>
+        <td>{{ food.fat_per_100g|floatformat:1 }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="5">No public foods available.</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<br>
+
+<h2>My Custom Foods</h2>
+<table border="1" cellpadding="8">
+    <tr>
+        <th>Name</th>
+        <th>Calories / 100g</th>
+        <th>Protein / 100g</th>
+        <th>Carbs / 100g</th>
+        <th>Fat / 100g</th>
+    </tr>
+
+    {% for food in custom_foods %}
+    <tr>
+        <td>{{ food.name }}</td>
+        <td>{{ food.calories_per_100g|floatformat:1 }}</td>
+        <td>{{ food.protein_per_100g|floatformat:1 }}</td>
+        <td>{{ food.carbs_per_100g|floatformat:1 }}</td>
+        <td>{{ food.fat_per_100g|floatformat:1 }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="5">You have not added any custom foods yet.</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

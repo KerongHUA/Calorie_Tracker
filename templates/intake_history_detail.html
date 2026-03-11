@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>History Detail</h1>
+<p>Date: {{ selected_date }}</p>
+
+<h2>Daily Totals</h2>
+<ul>
+    <li>Total Calories: {{ total_calories }} kcal</li>
+    <li>Total Protein: {{ total_protein }} g</li>
+    <li>Total Carbs: {{ total_carbs }} g</li>
+    <li>Total Fat: {{ total_fat }} g</li>
+</ul>
+
+<h2>Records</h2>
+<table border="1" cellpadding="8">
+    <tr>
+        <th>Food</th>
+        <th>Source</th>
+        <th>Quantity (g)</th>
+        <th>Calories (kcal)</th>
+        <th>Protein (g)</th>
+        <th>Carbs (g)</th>
+        <th>Fat (g)</th>
+    </tr>
+
+    {% for intake in intakes %}
+    <tr>
+        <td>
+            {% if intake.public_food %}
+                {{ intake.public_food.name }}
+            {% elif intake.custom_food %}
+                {{ intake.custom_food.name }}
+            {% endif %}
+        </td>
+        <td>
+            {% if intake.public_food %}
+                Public
+            {% elif intake.custom_food %}
+                Custom
+            {% endif %}
+        </td>
+        <td>{{ intake.quantity_grams }}</td>
+        <td>{{ intake.calories_consumed }}</td>
+        <td>{{ intake.protein_consumed }}</td>
+        <td>{{ intake.carbs_consumed }}</td>
+        <td>{{ intake.fat_consumed }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="7">No records for this date.</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<p><a href="{% url 'intake_history' %}">Back to History</a></p>
+{% endblock %}
