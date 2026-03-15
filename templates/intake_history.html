@@ -1,33 +1,49 @@
 {% extends "base.html" %}
 
+{% block title %}History | Calorie Tracker{% endblock %}
+
 {% block content %}
-<h1>Intake History</h1>
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+    <div>
+        <h1 class="section-title mb-1">Intake History</h1>
+        <p class="sub-title mb-0">Daily totals with drill-down details.</p>
+    </div>
+</div>
 
-<table border="1" cellpadding="8">
-    <tr>
-        <th>Date</th>
-        <th>Total Calories (kcal)</th>
-        <th>Total Protein (g)</th>
-        <th>Total Carbs (g)</th>
-        <th>Total Fat (g)</th>
-        <th>Action</th>
-    </tr>
-
-    {% for day in history %}
-    <tr>
-        <td>{{ day.intake_date }}</td>
-        <td>{{ day.total_calories|floatformat:1 }}</td>
-        <td>{{ day.total_protein|floatformat:1 }}</td>
-        <td>{{ day.total_carbs|floatformat:1 }}</td>
-        <td>{{ day.total_fat|floatformat:1 }}</td>
-        <td>
-            <a href="{% url 'intake_history_detail' day.intake_date|date:'Y-m-d' %}">View Details</a>
-        </td>
-    </tr>
-    {% empty %}
-    <tr>
-        <td colspan="6">No history records yet.</td>
-    </tr>
-    {% endfor %}
-</table>
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Total Calories</th>
+                        <th>Total Protein</th>
+                        <th>Total Carbs</th>
+                        <th>Total Fat</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for day in history %}
+                    <tr>
+                        <td>{{ day.intake_date }}</td>
+                        <td>{{ day.total_calories|floatformat:1 }} kcal</td>
+                        <td>{{ day.total_protein|floatformat:1 }} g</td>
+                        <td>{{ day.total_carbs|floatformat:1 }} g</td>
+                        <td>{{ day.total_fat|floatformat:1 }} g</td>
+                        <td>
+                            <a class="btn btn-sm btn-outline-primary" href="{% url 'intake_history_detail' day.intake_date|date:'Y-m-d' %}">View Details</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">No history records yet.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}

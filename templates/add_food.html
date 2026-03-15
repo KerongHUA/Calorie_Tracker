@@ -1,11 +1,22 @@
 {% extends "base.html" %}
 
-{% block content %}
-<h1>Add Custom Food</h1>
+{% block title %}Add Food | Calorie Tracker{% endblock %}
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save Food</button>
-</form>
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-7">
+        <div class="card">
+            <div class="card-body p-4">
+                <h1 class="section-title mb-1">Add Food</h1>
+                <p class="sub-title">Create a food item with nutrition values per 100g.</p>
+
+                <form method="post" class="app-form">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-primary">Save Food</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

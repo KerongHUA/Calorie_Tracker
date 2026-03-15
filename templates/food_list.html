@@ -1,59 +1,126 @@
 {% extends "base.html" %}
 
+{% block title %}Foods | Calorie Tracker{% endblock %}
+
 {% block content %}
-<h1>Food Catalogue</h1>
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+    <div>
+        <h1 class="section-title mb-1">Food Catalogue</h1>
+        <p class="sub-title mb-0">Browse public items and your custom foods.</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'add_custom_food' %}">Add Custom Food</a>
+</div>
 
-<p><a href="{% url 'add_custom_food' %}">Add Custom Food</a></p>
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-7">
+                <label class="form-label" for="foodSearchInput">Search Foods</label>
+                <input type="text" class="form-control" id="foodSearchInput" placeholder="Type name or nutrition keyword">
+            </div>
+            <div class="col-md-5">
+                <label class="form-label" for="foodSourceFilter">Source Filter</label>
+                <select class="form-select" id="foodSourceFilter">
+                    <option value="all">All</option>
+                    <option value="public">Public</option>
+                    <option value="custom">My Custom</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
 
-<h2>Public Foods</h2>
-<table border="1" cellpadding="8">
-    <tr>
-        <th>Name</th>
-        <th>Calories / 100g (kcal)</th>
-        <th>Protein / 100g</th>
-        <th>Carbs / 100g</th>
-        <th>Fat / 100g</th>
-    </tr>
+<div class="card mb-3" id="publicCard">
+    <div class="card-body">
+        <h2 class="h5 mb-3">Public Foods</h2>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="publicFoodsTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Calories / 100g (kcal)</th>
+                        <th>Protein / 100g (g)</th>
+                        <th>Carbs / 100g (g)</th>
+                        <th>Fat / 100g (g)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for food in public_foods %}
+                    <tr class="food-row" data-source="public">
+                        <td>{{ food.name }}</td>
+                        <td>{{ food.calories_per_100g|floatformat:1 }}</td>
+                        <td>{{ food.protein_per_100g|floatformat:1 }}</td>
+                        <td>{{ food.carbs_per_100g|floatformat:1 }}</td>
+                        <td>{{ food.fat_per_100g|floatformat:1 }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">No public foods available.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
-    {% for food in public_foods %}
-    <tr>
-        <td>{{ food.name }}</td>
-        <td>{{ food.calories_per_100g|floatformat:1 }}</td>
-        <td>{{ food.protein_per_100g|floatformat:1 }}</td>
-        <td>{{ food.carbs_per_100g|floatformat:1 }}</td>
-        <td>{{ food.fat_per_100g|floatformat:1 }}</td>
-    </tr>
-    {% empty %}
-    <tr>
-        <td colspan="5">No public foods available.</td>
-    </tr>
-    {% endfor %}
-</table>
+<div class="card" id="customCard">
+    <div class="card-body">
+        <h2 class="h5 mb-3">My Custom Foods</h2>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="customFoodsTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Calories / 100g (kcal)</th>
+                        <th>Protein / 100g (g)</th>
+                        <th>Carbs / 100g (g)</th>
+                        <th>Fat / 100g (g)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for food in custom_foods %}
+                    <tr class="food-row" data-source="custom">
+                        <td>{{ food.name }}</td>
+                        <td>{{ food.calories_per_100g|floatformat:1 }}</td>
+                        <td>{{ food.protein_per_100g|floatformat:1 }}</td>
+                        <td>{{ food.carbs_per_100g|floatformat:1 }}</td>
+                        <td>{{ food.fat_per_100g|floatformat:1 }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">You have not added custom foods yet.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
 
-<br>
+{% block extra_scripts %}
+<script>
+    (function () {
+        const queryInput = document.getElementById('foodSearchInput');
+        const sourceFilter = document.getElementById('foodSourceFilter');
+        const rows = Array.from(document.querySelectorAll('.food-row'));
 
-<h2>My Custom Foods</h2>
-<table border="1" cellpadding="8">
-    <tr>
-        <th>Name</th>
-        <th>Calories / 100g</th>
-        <th>Protein / 100g</th>
-        <th>Carbs / 100g</th>
-        <th>Fat / 100g</th>
-    </tr>
+        function applyFilter() {
+            const query = (queryInput.value || '').trim().toLowerCase();
+            const source = sourceFilter.value;
 
-    {% for food in custom_foods %}
-    <tr>
-        <td>{{ food.name }}</td>
-        <td>{{ food.calories_per_100g|floatformat:1 }}</td>
-        <td>{{ food.protein_per_100g|floatformat:1 }}</td>
-        <td>{{ food.carbs_per_100g|floatformat:1 }}</td>
-        <td>{{ food.fat_per_100g|floatformat:1 }}</td>
-    </tr>
-    {% empty %}
-    <tr>
-        <td colspan="5">You have not added any custom foods yet.</td>
-    </tr>
-    {% endfor %}
-</table>
+            rows.forEach(function (row) {
+                const rowText = row.innerText.toLowerCase();
+                const rowSource = row.dataset.source;
+                const queryMatch = !query || rowText.includes(query);
+                const sourceMatch = source === 'all' || rowSource === source;
+                row.style.display = queryMatch && sourceMatch ? '' : 'none';
+            });
+        }
+
+        queryInput.addEventListener('input', applyFilter);
+        sourceFilter.addEventListener('change', applyFilter);
+    })();
+</script>
 {% endblock %}

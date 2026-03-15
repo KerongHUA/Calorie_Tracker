@@ -1,57 +1,70 @@
 {% extends "base.html" %}
 
+{% block title %}History Detail | Calorie Tracker{% endblock %}
+
 {% block content %}
-<h1>History Detail</h1>
-<p>Date: {{ selected_date }}</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+    <div>
+        <h1 class="section-title mb-1">History Detail</h1>
+        <p class="sub-title mb-0">Date: {{ selected_date }}</p>
+    </div>
+    <a class="btn btn-outline-primary" href="{% url 'intake_history' %}">Back to History</a>
+</div>
 
-<h2>Daily Totals</h2>
-<ul>
-    <li>Total Calories: {{ total_calories }} kcal</li>
-    <li>Total Protein: {{ total_protein }} g</li>
-    <li>Total Carbs: {{ total_carbs }} g</li>
-    <li>Total Fat: {{ total_fat }} g</li>
-</ul>
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3"><div class="card"><div class="card-body"><div class="text-muted small">Calories</div><div class="fs-5 fw-semibold">{{ total_calories|floatformat:1 }}</div><div class="small text-muted">kcal</div></div></div></div>
+    <div class="col-6 col-lg-3"><div class="card"><div class="card-body"><div class="text-muted small">Protein</div><div class="fs-5 fw-semibold">{{ total_protein|floatformat:1 }}</div><div class="small text-muted">g</div></div></div></div>
+    <div class="col-6 col-lg-3"><div class="card"><div class="card-body"><div class="text-muted small">Carbs</div><div class="fs-5 fw-semibold">{{ total_carbs|floatformat:1 }}</div><div class="small text-muted">g</div></div></div></div>
+    <div class="col-6 col-lg-3"><div class="card"><div class="card-body"><div class="text-muted small">Fat</div><div class="fs-5 fw-semibold">{{ total_fat|floatformat:1 }}</div><div class="small text-muted">g</div></div></div></div>
+</div>
 
-<h2>Records</h2>
-<table border="1" cellpadding="8">
-    <tr>
-        <th>Food</th>
-        <th>Source</th>
-        <th>Quantity (g)</th>
-        <th>Calories (kcal)</th>
-        <th>Protein (g)</th>
-        <th>Carbs (g)</th>
-        <th>Fat (g)</th>
-    </tr>
-
-    {% for intake in intakes %}
-    <tr>
-        <td>
-            {% if intake.public_food %}
-                {{ intake.public_food.name }}
-            {% elif intake.custom_food %}
-                {{ intake.custom_food.name }}
-            {% endif %}
-        </td>
-        <td>
-            {% if intake.public_food %}
-                Public
-            {% elif intake.custom_food %}
-                Custom
-            {% endif %}
-        </td>
-        <td>{{ intake.quantity_grams }}</td>
-        <td>{{ intake.calories_consumed }}</td>
-        <td>{{ intake.protein_consumed }}</td>
-        <td>{{ intake.carbs_consumed }}</td>
-        <td>{{ intake.fat_consumed }}</td>
-    </tr>
-    {% empty %}
-    <tr>
-        <td colspan="7">No records for this date.</td>
-    </tr>
-    {% endfor %}
-</table>
-
-<p><a href="{% url 'intake_history' %}">Back to History</a></p>
+<div class="card">
+    <div class="card-body">
+        <h2 class="h5 mb-3">Records</h2>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Food</th>
+                        <th>Source</th>
+                        <th>Quantity (g)</th>
+                        <th>Calories (kcal)</th>
+                        <th>Protein (g)</th>
+                        <th>Carbs (g)</th>
+                        <th>Fat (g)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for intake in intakes %}
+                    <tr>
+                        <td>
+                            {% if intake.public_food %}
+                                {{ intake.public_food.name }}
+                            {% elif intake.custom_food %}
+                                {{ intake.custom_food.name }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if intake.public_food %}
+                                <span class="badge text-bg-info">Public</span>
+                            {% elif intake.custom_food %}
+                                <span class="badge text-bg-secondary">Custom</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ intake.quantity_grams|floatformat:1 }}</td>
+                        <td>{{ intake.calories_consumed|floatformat:1 }}</td>
+                        <td>{{ intake.protein_consumed|floatformat:1 }}</td>
+                        <td>{{ intake.carbs_consumed|floatformat:1 }}</td>
+                        <td>{{ intake.fat_consumed|floatformat:1 }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">No records for this date.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}
