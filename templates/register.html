@@ -1,12 +1,90 @@
 {% extends "base.html" %}
 
-{% block content %}
-<h1>Create Account</h1>
-<p>Sign up to start tracking your daily calories and nutrition goals.</p>
+{% block title %}Register | Calorie Tracker{% endblock %}
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Create Account</button>
-</form>
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7 col-xl-6">
+        <div class="card">
+            <div class="card-body p-4">
+                <h1 class="section-title mb-1">Create Account</h1>
+                <p class="sub-title">Sign up to start tracking your daily calories and nutrition goals.</p>
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger py-2">{{ form.non_field_errors }}</div>
+                {% endif %}
+
+                <form method="post" id="registerForm" class="app-form" novalidate>
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label" for="id_username">Username</label>
+                        <input type="text" name="username" class="form-control" id="id_username" required minlength="3" value="{{ form.username.value|default:'' }}">
+                        {% if form.username.errors %}<div class="text-danger small mt-1">{{ form.username.errors|striptags }}</div>{% endif %}
+                        <div class="invalid-feedback">Username must be at least 3 characters.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="id_email">Email</label>
+                        <input type="email" name="email" class="form-control" id="id_email" required value="{{ form.email.value|default:'' }}">
+                        {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors|striptags }}</div>{% endif %}
+                        <div class="invalid-feedback">Please provide a valid email address.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="id_password1">Password</label>
+                        <input type="password" name="password1" class="form-control" id="id_password1" required minlength="8">
+                        {% if form.password1.errors %}<div class="text-danger small mt-1">{{ form.password1.errors|striptags }}</div>{% endif %}
+                        <div class="invalid-feedback">Password must be at least 8 characters.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="id_password2">Confirm Password</label>
+                        <input type="password" name="password2" class="form-control" id="id_password2" required>
+                        {% if form.password2.errors %}<div class="text-danger small mt-1">{{ form.password2.errors|striptags }}</div>{% endif %}
+                        <div class="invalid-feedback">Passwords must match.</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Create Account</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    (function () {
+        const form = document.getElementById('registerForm');
+        if (!form) return;
+
+        const pwd1 = document.getElementById('id_password1');
+        const pwd2 = document.getElementById('id_password2');
+
+        function validateMatch() {
+            if (!pwd1.value || !pwd2.value) {
+                pwd2.setCustomValidity('');
+                return;
+            }
+            if (pwd1.value !== pwd2.value) {
+                pwd2.setCustomValidity('Passwords do not match');
+            } else {
+                pwd2.setCustomValidity('');
+            }
+        }
+
+        pwd1.addEventListener('input', validateMatch);
+        pwd2.addEventListener('input', validateMatch);
+
+        form.addEventListener('submit', function (event) {
+            validateMatch();
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        });
+    })();
+</script>
 {% endblock %}

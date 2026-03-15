@@ -4,11 +4,21 @@ from foods.models import FoodCatalogue, CustomFood
 
 
 class DailyIntakeForm(forms.ModelForm):
-    food_choice = forms.ChoiceField(choices=[])
+    food_choice = forms.ChoiceField(
+        choices=[],
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
 
     class Meta:
         model = DailyIntake
         fields = ['food_choice', 'quantity_grams']
+        widgets = {
+            'quantity_grams': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0.1',
+                'step': '0.1',
+            })
+        }
 
     def __init__(self, *args, user=None, **kwargs):
         instance = kwargs.get('instance')
@@ -19,12 +29,30 @@ class DailyIntakeForm(forms.ModelForm):
         custom_foods = CustomFood.objects.filter(user=user).order_by('name') if user else []
 
         public_choices = [
-            (f'public_{food.id}', food.name)
+            (
+                f'public_{food.id}',
+                (
+                    f"{food.name} "
+                    f"({food.calories_per_100g:.1f} kcal, "
+                    f"P {food.protein_per_100g:.1f}g, "
+                    f"C {food.carbs_per_100g:.1f}g, "
+                    f"F {food.fat_per_100g:.1f}g / 100g)"
+                )
+            )
             for food in public_foods
         ]
 
         custom_choices = [
-            (f'custom_{food.id}', food.name)
+            (
+                f'custom_{food.id}',
+                (
+                    f"{food.name} "
+                    f"({food.calories_per_100g:.1f} kcal, "
+                    f"P {food.protein_per_100g:.1f}g, "
+                    f"C {food.carbs_per_100g:.1f}g, "
+                    f"F {food.fat_per_100g:.1f}g / 100g)"
+                )
+            )
             for food in custom_foods
         ]
 

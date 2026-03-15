@@ -1,11 +1,105 @@
 {% extends "base.html" %}
 
-{% block content %}
-<h1>Add Custom Food</h1>
+{% block title %}Add Custom Food | Calorie Tracker{% endblock %}
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save Custom Food</button>
-</form>
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-7">
+        <div class="card">
+            <div class="card-body p-4">
+                <h1 class="section-title mb-1">Add Custom Food</h1>
+                <p class="sub-title">Create your own food item with nutrition values per 100g.</p>
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger py-2">{{ form.non_field_errors }}</div>
+                {% endif %}
+
+                <form method="post" id="customFoodForm" class="app-form" novalidate>
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label" for="id_name">Food Name</label>
+                            <input type="text" name="name" id="id_name" class="form-control" required value="{{ form.name.value|default:'' }}">
+                            {% if form.name.errors %}<div class="text-danger small mt-1">{{ form.name.errors|striptags }}</div>{% endif %}
+                            <div class="invalid-feedback">Please enter a food name.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="id_calories_per_100g">Calories / 100g</label>
+                            <input type="number" step="0.1" min="0" name="calories_per_100g" id="id_calories_per_100g" class="form-control" required value="{{ form.calories_per_100g.value|default:'' }}">
+                            {% if form.calories_per_100g.errors %}<div class="text-danger small mt-1">{{ form.calories_per_100g.errors|striptags }}</div>{% endif %}
+                            <div class="invalid-feedback">Calories cannot be negative.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="id_protein_per_100g">Protein / 100g</label>
+                            <input type="number" step="0.1" min="0" name="protein_per_100g" id="id_protein_per_100g" class="form-control" required value="{{ form.protein_per_100g.value|default:'' }}">
+                            {% if form.protein_per_100g.errors %}<div class="text-danger small mt-1">{{ form.protein_per_100g.errors|striptags }}</div>{% endif %}
+                            <div class="invalid-feedback">Protein cannot be negative.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="id_carbs_per_100g">Carbs / 100g</label>
+                            <input type="number" step="0.1" min="0" name="carbs_per_100g" id="id_carbs_per_100g" class="form-control" required value="{{ form.carbs_per_100g.value|default:'' }}">
+                            {% if form.carbs_per_100g.errors %}<div class="text-danger small mt-1">{{ form.carbs_per_100g.errors|striptags }}</div>{% endif %}
+                            <div class="invalid-feedback">Carbs cannot be negative.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="id_fat_per_100g">Fat / 100g</label>
+                            <input type="number" step="0.1" min="0" name="fat_per_100g" id="id_fat_per_100g" class="form-control" required value="{{ form.fat_per_100g.value|default:'' }}">
+                            {% if form.fat_per_100g.errors %}<div class="text-danger small mt-1">{{ form.fat_per_100g.errors|striptags }}</div>{% endif %}
+                            <div class="invalid-feedback">Fat cannot be negative.</div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-4">Save Custom Food</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    (function () {
+        const form = document.getElementById('customFoodForm');
+        if (!form) return;
+
+        const numericIds = [
+            'id_calories_per_100g',
+            'id_protein_per_100g',
+            'id_carbs_per_100g',
+            'id_fat_per_100g'
+        ];
+
+        function validatePositive(id) {
+            const input = document.getElementById(id);
+            if (!input) return;
+            if (input.value === '') {
+                input.setCustomValidity('');
+                return;
+            }
+            const value = Number(input.value);
+            if (value < 0 || Number.isNaN(value)) {
+                input.setCustomValidity('Must be 0 or above');
+            } else {
+                input.setCustomValidity('');
+            }
+        }
+
+        numericIds.forEach(function (id) {
+            const input = document.getElementById(id);
+            if (!input) return;
+            input.addEventListener('input', function () {
+                validatePositive(id);
+            });
+        });
+
+        form.addEventListener('submit', function (event) {
+            numericIds.forEach(validatePositive);
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        });
+    })();
+</script>
 {% endblock %}

@@ -1,17 +1,104 @@
 {% extends "base.html" %}
 
+{% block title %}Profile | Calorie Tracker{% endblock %}
+
 {% block content %}
-<h1>User Profile</h1>
+<div class="row g-3">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-body p-4">
+                <h1 class="section-title mb-1">User Profile</h1>
+                <p class="sub-title">Set your body metrics for better tracking context.</p>
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save Profile</button>
-</form>
+                <form method="post" id="profileForm" class="app-form" novalidate>
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" for="id_height_cm">Height (cm)</label>
+                            <input type="number" step="0.1" min="1" class="form-control" id="id_height_cm" name="height_cm" value="{{ form.height_cm.value|default:'' }}">
+                            {% if form.height_cm.errors %}<div class="text-danger small mt-1">{{ form.height_cm.errors|striptags }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="id_weight_kg">Weight (kg)</label>
+                            <input type="number" step="0.1" min="1" class="form-control" id="id_weight_kg" name="weight_kg" value="{{ form.weight_kg.value|default:'' }}">
+                            {% if form.weight_kg.errors %}<div class="text-danger small mt-1">{{ form.weight_kg.errors|striptags }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="id_age">Age</label>
+                            <input type="number" min="1" class="form-control" id="id_age" name="age" value="{{ form.age.value|default:'' }}">
+                            {% if form.age.errors %}<div class="text-danger small mt-1">{{ form.age.errors|striptags }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="id_sex">Sex</label>
+                            <select class="form-select" id="id_sex" name="sex">
+                                <option value="" {% if not form.sex.value %}selected{% endif %}>Select one</option>
+                                <option value="male" {% if form.sex.value == 'male' %}selected{% endif %}>Male</option>
+                                <option value="female" {% if form.sex.value == 'female' %}selected{% endif %}>Female</option>
+                                <option value="other" {% if form.sex.value == 'other' %}selected{% endif %}>Other</option>
+                            </select>
+                            {% if form.sex.errors %}<div class="text-danger small mt-1">{{ form.sex.errors|striptags }}</div>{% endif %}
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-4">Save Profile</button>
+                </form>
+            </div>
+        </div>
+    </div>
 
-{% if profile.bmi_value %}
-    <h2>BMI Result</h2>
-    <p>BMI: {{ profile.bmi_value|floatformat:1 }}</p>
-    <p>Category: {{ profile.bmi_category }}</p>
-{% endif %}
+    <div class="col-lg-5">
+        <div class="card h-100">
+            <div class="card-body p-4">
+                <h2 class="h5 mb-3">BMI Result</h2>
+                {% if profile.bmi_value %}
+                    <p class="mb-1"><strong>BMI:</strong> {{ profile.bmi_value|floatformat:1 }}</p>
+                    <p class="mb-0"><strong>Category:</strong> {{ profile.bmi_category }}</p>
+                {% else %}
+                    <p class="text-muted mb-0">Fill in your height and weight to calculate BMI.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    (function () {
+        const form = document.getElementById('profileForm');
+        if (!form) return;
+
+        const numericIds = ['id_height_cm', 'id_weight_kg', 'id_age'];
+
+        function validateField(id) {
+            const input = document.getElementById(id);
+            if (!input || !input.value) {
+                input?.setCustomValidity('');
+                return;
+            }
+            const value = Number(input.value);
+            if (value <= 0 || Number.isNaN(value)) {
+                input.setCustomValidity('Must be greater than 0');
+            } else {
+                input.setCustomValidity('');
+            }
+        }
+
+        numericIds.forEach(function (id) {
+            const input = document.getElementById(id);
+            if (!input) return;
+            input.addEventListener('input', function () {
+                validateField(id);
+            });
+        });
+
+        form.addEventListener('submit', function (event) {
+            numericIds.forEach(validateField);
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        });
+    })();
+</script>
 {% endblock %}

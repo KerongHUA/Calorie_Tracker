@@ -1,11 +1,58 @@
 {% extends "base.html" %}
 
-{% block content %}
-<h1>Daily Goals</h1>
+{% block title %}Daily Goals | Calorie Tracker{% endblock %}
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save Goals</button>
-</form>
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-body p-4">
+                <h1 class="section-title mb-1">Daily Goals</h1>
+                <p class="sub-title">Adjust your daily calorie and macro targets.</p>
+
+                <form method="post" class="app-form">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" for="id_target_calories">Calories (kcal)</label>
+                            {{ form.target_calories }}
+                            {% if form.target_calories.errors %}<div class="text-danger small mt-1">{{ form.target_calories.errors|striptags }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="id_target_protein">Protein (g)</label>
+                            {{ form.target_protein }}
+                            {% if form.target_protein.errors %}<div class="text-danger small mt-1">{{ form.target_protein.errors|striptags }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="id_target_carbs">Carbs (g)</label>
+                            {{ form.target_carbs }}
+                            {% if form.target_carbs.errors %}<div class="text-danger small mt-1">{{ form.target_carbs.errors|striptags }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="id_target_fat">Fat (g)</label>
+                            {{ form.target_fat }}
+                            {% if form.target_fat.errors %}<div class="text-danger small mt-1">{{ form.target_fat.errors|striptags }}</div>{% endif %}
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-4">Save Goals</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    (function () {
+        ['id_target_calories', 'id_target_protein', 'id_target_carbs', 'id_target_fat'].forEach(function (id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.classList.add('form-control');
+                el.setAttribute('min', '0');
+                el.setAttribute('step', '0.1');
+            }
+        });
+    })();
+</script>
 {% endblock %}

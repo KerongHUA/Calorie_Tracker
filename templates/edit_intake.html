@@ -1,11 +1,116 @@
 {% extends "base.html" %}
 
-{% block content %}
-<h1>Edit Intake</h1>
+{% block title %}Edit Intake | Calorie Tracker{% endblock %}
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Update Intake</button>
-</form>
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-7">
+        <div class="card">
+            <div class="card-body p-4">
+                <h1 class="section-title mb-1">Edit Intake</h1>
+                <p class="sub-title">Update food choice or quantity with instant estimate.</p>
+
+                <form method="post" id="editIntakeForm" class="app-form" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label" for="id_food_choice">Food</label>
+                        {{ form.food_choice }}
+                        {% if form.food_choice.errors %}<div class="text-danger small mt-1">{{ form.food_choice.errors|striptags }}</div>{% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="id_quantity_grams">Quantity (grams)</label>
+                        {{ form.quantity_grams }}
+                        {% if form.quantity_grams.errors %}<div class="text-danger small mt-1">{{ form.quantity_grams.errors|striptags }}</div>{% endif %}
+                    </div>
+
+                    <div class="card bg-light border-0 mb-3">
+                        <div class="card-body py-3">
+                            <h2 class="h6 mb-3">Estimated Nutrition</h2>
+                            <div class="row g-2">
+                                <div class="col-6 col-md-3"><strong id="estKcal">-</strong><div class="small text-muted">kcal</div></div>
+                                <div class="col-6 col-md-3"><strong id="estProtein">-</strong><div class="small text-muted">Protein (g)</div></div>
+                                <div class="col-6 col-md-3"><strong id="estCarbs">-</strong><div class="small text-muted">Carbs (g)</div></div>
+                                <div class="col-6 col-md-3"><strong id="estFat">-</strong><div class="small text-muted">Fat (g)</div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Update Intake</button>
+                        <a class="btn btn-outline-secondary" href="{% url 'intake_list' %}">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    (function () {
+        const form = document.getElementById('editIntakeForm');
+        const foodSelect = document.getElementById('id_food_choice');
+        const qtyInput = document.getElementById('id_quantity_grams');
+        if (!form || !foodSelect || !qtyInput) return;
+
+        foodSelect.classList.add('form-select');
+        qtyInput.classList.add('form-control');
+        qtyInput.setAttribute('min', '0.1');
+        qtyInput.setAttribute('step', '0.1');
+
+        const est = {
+            kcal: document.getElementById('estKcal'),
+            protein: document.getElementById('estProtein'),
+            carbs: document.getElementById('estCarbs'),
+            fat: document.getElementById('estFat')
+        };
+
+        function parseNutritionFromLabel(label) {
+            const kcalMatch = label.match(/([0-9]+(?:\.[0-9]+)?)\s*kcal/i);
+            const pMatch = label.match(/P\s*([0-9]+(?:\.[0-9]+)?)/i);
+            const cMatch = label.match(/C\s*([0-9]+(?:\.[0-9]+)?)/i);
+            const fMatch = label.match(/F\s*([0-9]+(?:\.[0-9]+)?)/i);
+            if (!kcalMatch || !pMatch || !cMatch || !fMatch) return null;
+            return {
+                kcal100: Number(kcalMatch[1]),
+                p100: Number(pMatch[1]),
+                c100: Number(cMatch[1]),
+                f100: Number(fMatch[1])
+            };
+        }
+
+        function updateEstimate() {
+            const selectedOption = foodSelect.options[foodSelect.selectedIndex];
+            const grams = Number(qtyInput.value);
+
+            if (!selectedOption || Number.isNaN(grams) || grams <= 0) {
+                est.kcal.textContent = '-';
+                est.protein.textContent = '-';
+                est.carbs.textContent = '-';
+                est.fat.textContent = '-';
+                return;
+            }
+
+            const nutrition = parseNutritionFromLabel(selectedOption.textContent || '');
+            if (!nutrition) {
+                est.kcal.textContent = '-';
+                est.protein.textContent = '-';
+                est.carbs.textContent = '-';
+                est.fat.textContent = '-';
+                return;
+            }
+
+            const factor = grams / 100;
+            est.kcal.textContent = (nutrition.kcal100 * factor).toFixed(1);
+            est.protein.textContent = (nutrition.p100 * factor).toFixed(1);
+            est.carbs.textContent = (nutrition.c100 * factor).toFixed(1);
+            est.fat.textContent = (nutrition.f100 * factor).toFixed(1);
+        }
+
+        qtyInput.addEventListener('input', updateEstimate);
+        foodSelect.addEventListener('change', updateEstimate);
+        updateEstimate();
+    })();
+</script>
 {% endblock %}
